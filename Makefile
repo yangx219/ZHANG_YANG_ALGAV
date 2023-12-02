@@ -4,7 +4,7 @@ all:
 	@echo "Compiling..."
 	gcc ALGAV_Projet.c -o ALGAV_Projet.o 
 	@echo "Compiling done"
-	@echo "Running..."s
+	@echo "Running..."
 	./ALGAV_Projet.o
 	@echo "Running done"
 

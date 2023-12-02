@@ -78,9 +78,8 @@ bool process_file(const char *filename)
                    &key.parts[2],
                    &key.parts[3]) == 4)
         {
-            //
+            
             print_uint128(&key);
-            //
         }
         else
         {
