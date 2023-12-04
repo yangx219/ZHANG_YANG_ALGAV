@@ -16,3 +16,6 @@ calculPerformanceTas:
 	gcc cle.c tas.c calculPerformanceTas.c -o calculPerformanceTas
 	./calculPerformanceTas
 
+clean:
+	rm -f *.o calculPerformanceTas testCle
+

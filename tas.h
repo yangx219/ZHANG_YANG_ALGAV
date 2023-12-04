@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include "cle.h"
+#include <stdbool.h>
 
 /*
 En cours, nous avons introduit la structure de données de tas min. Nous allons la représenter en
@@ -23,6 +24,7 @@ typedef struct
 {
     uint128_t *cles; // Tableau des clés
     int taille;      // Nombre d'éléments dans le tas
+    int capacite;    // Capacité du tableau
 } Tas;
 
 // Fonction pour échanger deux éléments uint128_t
@@ -33,9 +35,11 @@ void SiftDown(Tas *tas, int index);
 
 // SupprMin : Supprime l'élément minimal du tas
 void SupprMin(Tas *tas);
+void SupprMinAdapter(Tas *tas, uint128_t *dataset, int size);
 
 // Ajout : Ajoute un nouvel élément au tas
 void Ajout(Tas *tas, uint128_t cle);
+void AjoutAdapter(Tas *tas, uint128_t *dataset, int size);
 
 // AjoutsIteratifs : Construit un tas en ajoutant itérativement chaque clé
 void AjoutsIteratifs(Tas *tas, uint128_t *cles, int taille);
@@ -52,7 +56,10 @@ bool load_dataset(const char *filename, uint128_t **dataset, int *dataset_size);
 
 double get_time();
 
-// 测试函数性能并将结果写入CSV文件
+
 void test_function_and_write_to_csv(FILE *csv_file, const char *function_name, uint128_t *dataset, int size, void (*function)(Tas *, uint128_t *, int));
 
+void test_Ajout_performance(FILE *csv_file, uint128_t *dataset, int size);
+
+void test_SupprMin_performance(FILE *csv_file, uint128_t *dataset, int size);
 #endif

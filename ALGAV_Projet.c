@@ -413,6 +413,8 @@ int main()
             // 进行测试并将结果写入CSV文件
             test_function_and_write_to_csv(csv_file, "AjoutsIteratifs", dataset, size, AjoutsIteratifs);
             test_function_and_write_to_csv(csv_file, "Construction", dataset, size, Construction);
+            test_function_and_write_to_csv(csv_file, "SupprMin", dataset, size, Construction);
+            test_function_and_write_to_csv(csv_file, "Ajout", dataset, size, Construction);
 
             uint128_t *dataset_copy = malloc(size * sizeof(uint128_t));
             if (dataset_copy == NULL)
