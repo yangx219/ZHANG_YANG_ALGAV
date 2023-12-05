@@ -34,16 +34,15 @@ int main()
                 continue; // 如果无法加载数据集则跳过这个数据集
             }
 
-            // 初始化Tas结构
-            Tas tas = {NULL, 0}; // 初始化tas结构的指针为NULL，大小为0
 
             // 进行测试并将结果写入CSV文件
             test_function_and_write_to_csv(csv_file, "AjoutsIteratifs", dataset, size, AjoutsIteratifs);
             test_function_and_write_to_csv(csv_file, "Construction", dataset, size, Construction);
             
-            test_Ajout_performance(csv_file, dataset, size);
+            //test_Ajout_performance(csv_file, dataset, size);
 
-            test_SupprMin_performance(csv_file, dataset, size);
+            // 测试 SupprMin 函数的性能
+            //test_SupprMin_performance(csv_file, dataset, size);
 
             uint128_t *dataset_copy = malloc(size * sizeof(uint128_t));
             if (dataset_copy == NULL)
@@ -67,7 +66,6 @@ int main()
             double end_time = get_time();
             fprintf(csv_file, "Union,%d,%.6f\n", size, end_time - start_time);
 
-            free(tas1.cles);    // 释放由 Union 分配的内存
             free(dataset_copy); // 释放 dataset_copy
         }
     }

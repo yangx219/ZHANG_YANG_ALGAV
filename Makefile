@@ -12,10 +12,14 @@ testCle:
 	gcc cle.c testCle.c -o testCle
 	./testCle
 
+testOperation:
+	gcc cle.c tas.c testOperation.c -o testOperation
+	./testOperation
+
 calculPerformanceTas:
 	gcc cle.c tas.c calculPerformanceTas.c -o calculPerformanceTas
 	./calculPerformanceTas
 
 clean:
-	rm -f *.o calculPerformanceTas testCle
+	rm -f *.o calculPerformanceTas testCle testOperation
 

@@ -6,6 +6,7 @@
 #include "tas.h"
 #include <mach/mach_time.h>
 #define REPEATS 10
+#define INITIAL_CAPACITY 1000
 
 // Fonction pour échanger deux éléments uint128_t
 void echanger(uint128_t *a, uint128_t *b)
@@ -16,24 +17,24 @@ void echanger(uint128_t *a, uint128_t *b)
 }
 
 // Fonction pour restaurer les propriétés d'un tas min après la suppression du min
-void SiftDown(Tas *tas, int index)
-{
-    int gauche = 2 * index + 1;
-    int droite = 2 * index + 2;
-    int plusPetit = index;
+void SiftDown(Tas *tas, int index) {
+    while (index < tas->taille) {
+        int gauche = 2 * index + 1;
+        int droite = 2 * index + 2;
+        int plusPetit = index;
 
-    if (gauche < tas->taille && inf(tas->cles[gauche], tas->cles[index]))
-    {
-        plusPetit = gauche;
-    }
-    if (droite < tas->taille && inf(tas->cles[droite], tas->cles[plusPetit]))
-    {
-        plusPetit = droite;
-    }
-    if (plusPetit != index)
-    {
-        echanger(&tas->cles[index], &tas->cles[plusPetit]);
-        SiftDown(tas, plusPetit);
+        if (gauche < tas->taille && inf(tas->cles[gauche], tas->cles[index])) {
+            plusPetit = gauche;
+        }
+        if (droite < tas->taille && inf(tas->cles[droite], tas->cles[plusPetit])) {
+            plusPetit = droite;
+        }
+        if (plusPetit != index) {
+            echanger(&tas->cles[index], &tas->cles[plusPetit]);
+            index = plusPetit; // Continue sifting down the child
+        } else {
+            break; // The heap property is satisfied
+        }
     }
 }
 
@@ -50,59 +51,31 @@ void SupprMin(Tas *tas)
     // Restaure les propriétés du tas min
     SiftDown(tas, 0);
 }
-void SupprMinAdapter(Tas *tas, uint128_t *dataset, int size) {
-    SupprMin(tas);
-}
+
 
 
 // Ajout : Ajoute un nouvel élément au tas
-/*void Ajout(Tas *tas, uint128_t cle)
-{
-    // Augmenter la taille du tableau
-    tas->taille++;
-    tas->cles = realloc(tas->cles, tas->taille * sizeof(uint128_t));
-    if (!tas->cles)
-    {
-        perror("Échec de l'allocation mémoire");
-        exit(EXIT_FAILURE);
-    }
-
-    // Ajouter la nouvelle clé à la fin et remonter
-    int i = tas->taille - 1;
-    tas->cles[i] = cle;
-    while (i > 0 && inf(tas->cles[i], tas->cles[(i - 1) / 2]))
-    {
-        echanger(&tas->cles[i], &tas->cles[(i - 1) / 2]);
-        i = (i - 1) / 2;
-    }
-}*/
 
 void Ajout(Tas *tas, uint128_t cle) {
-    // 检查是否需要扩展数组
-    if (tas->taille == tas->capacite) {
-        // 将容量加倍或增加一个固定大小
-        tas->capacite = tas->capacite > 0 ? tas->capacite * 2 : 2;
-        uint128_t *new_cles = malloc(tas->capacite * sizeof(uint128_t));
-        if (!new_cles) {
-            perror("Échec de l'allocation mémoire");
+    if (tas->taille >= tas->capacite) {
+        int nouvelleCapacite = tas->capacite + (tas->capacite >> 1);  // Augmenter la capacité de 50%
+        uint128_t *nouvellesCles = realloc(tas->cles, nouvelleCapacite * sizeof(uint128_t));
+        if (!nouvellesCles) {
+            perror("Allocation failure in Ajout");
             exit(EXIT_FAILURE);
         }
-        memcpy(new_cles, tas->cles, tas->taille * sizeof(uint128_t));
-        free(tas->cles);
-        tas->cles = new_cles;
+        tas->cles = nouvellesCles;
+        tas->capacite = nouvelleCapacite;
     }
-
-    // 插入新元素
     tas->cles[tas->taille] = cle;
     int i = tas->taille;
     tas->taille++;
-
-    // 上浮新元素
     while (i > 0 && inf(tas->cles[i], tas->cles[(i - 1) / 2])) {
         echanger(&tas->cles[i], &tas->cles[(i - 1) / 2]);
         i = (i - 1) / 2;
     }
 }
+
 
 // AjoutsIteratifs : Construit un tas en ajoutant itérativement chaque clé
 void AjoutsIteratifs(Tas *tas, uint128_t *cles, int taille)
@@ -249,16 +222,6 @@ bool load_dataset(const char *filename, uint128_t **dataset, int *dataset_size)
     fclose(file);
     return true;
 }
-/*double get_time() {
-    static mach_timebase_info_data_t info = {0};
-    if (info.denom == 0) {
-        mach_timebase_info(&info);
-    }
-    uint64_t now = mach_absolute_time();
-    uint64_t nanos = now * info.numer / info.denom;
-    return (double)nanos / 1e9;
-}
-*/
 
 double get_time(){
     struct timespec t;
@@ -268,49 +231,71 @@ double get_time(){
 
 // 测试函数性能并将结果写入CSV文件
 void test_function_and_write_to_csv(FILE *csv_file, const char *function_name, uint128_t *dataset, int size, void (*function)(Tas *, uint128_t *, int)) {
-    double start_time, end_time, total_time = 0.0;
-    Tas tas = {NULL, 0, 0};  // 初始化Tas结构
+    double total_time = 0.0;
 
     for (int i = 0; i < REPEATS; ++i) {
-        tas.taille = 0;  // 重置tas的大小
-        start_time = get_time();
+        Tas tas = {malloc(INITIAL_CAPACITY * sizeof(uint128_t)), 0, INITIAL_CAPACITY}; // 预先分配足够的内存
+
+        double start_time = get_time();
         function(&tas, dataset, size);
-        end_time = get_time();
+        double end_time = get_time();
+
         total_time += end_time - start_time;
+        free(tas.cles);  // 立即释放内存
     }
 
     double average_time = total_time / REPEATS;
     fprintf(csv_file, "%s,%d,%.6f\n", function_name, size, average_time);
-    
-    free(tas.cles);  // 释放内存
 }
-// 测试 Ajout 函数的整体性能
-void test_Ajout_performance(FILE *csv_file, uint128_t *dataset, int dataset_size) {
+/*void test_Ajout_performance(FILE *csv_file, uint128_t *dataset, int dataset_size) {
+    Tas tas = {malloc(INITIAL_CAPACITY * sizeof(uint128_t)), 0, INITIAL_CAPACITY};
     double total_time = 0.0;
 
     for (int repeat = 0; repeat < REPEATS; ++repeat) {
-        Tas tas = {NULL, 0, 0};
         double start_time = get_time();
-
         for (int i = 0; i < dataset_size; ++i) {
             Ajout(&tas, dataset[i]);
         }
-
         double end_time = get_time();
         total_time += (end_time - start_time);
-        free(tas.cles);
+        
+        // Reset the heap for the next iteration
+        tas.taille = 0;
+    }
+    free(tas.cles);
+    double average_time = total_time / REPEATS;
+    fprintf(csv_file, "Ajout,%d,%.6f\n", dataset_size, average_time);
+}*/
+
+void test_Ajout_performance(FILE *csv_file, uint128_t *dataset, int dataset_size) {
+    Tas tas = {malloc(INITIAL_CAPACITY * sizeof(uint128_t)), 0, INITIAL_CAPACITY};
+    double total_time = 0.0;
+
+    for (int repeat = 0; repeat < REPEATS; ++repeat) {
+        double start_time = get_time();
+        for (int i = 0; i < dataset_size; ++i) {
+            Ajout(&tas, dataset[i]);
+        }
+        double end_time = get_time();
+        total_time += (end_time - start_time);
+        // 清空堆，以便下一次重复测试
+        tas.taille = 0;
     }
 
+    free(tas.cles);
     double average_time = total_time / REPEATS;
     fprintf(csv_file, "Ajout,%d,%.6f\n", dataset_size, average_time);
 }
 
-// 测试 SupprMin 函数的整体性能
+
+
 void test_SupprMin_performance(FILE *csv_file, uint128_t *dataset, int dataset_size) {
     double total_time = 0.0;
 
     for (int repeat = 0; repeat < REPEATS; ++repeat) {
-        Tas tas = {NULL, 0, 0};
+        Tas tas = {malloc(INITIAL_CAPACITY * sizeof(uint128_t)), 0, INITIAL_CAPACITY};
+
+        // 先将所有元素添加到堆中，但不包括在计时中
         for (int i = 0; i < dataset_size; ++i) {
             Ajout(&tas, dataset[i]);
         }

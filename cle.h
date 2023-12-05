@@ -2,6 +2,7 @@
 #define CLE_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 // Question 1.1 Définition d'un type pour représenter un entier de 128 bits
 typedef struct
