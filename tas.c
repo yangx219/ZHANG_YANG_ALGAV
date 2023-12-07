@@ -210,8 +210,8 @@ bool load_dataset(const char *filename, uint128_t **dataset, int *dataset_size)
     uint128_t key;
     int count = 0;
     while (fscanf(file, "%8x%8x%8x%8x",
-                  &key.parts[0], &key.parts[1],
-                  &key.parts[2], &key.parts[3]) == 4)
+                  &key.parts[3], &key.parts[2],
+                  &key.parts[1], &key.parts[0]) == 4)
     {
         if (count < *dataset_size)
         {

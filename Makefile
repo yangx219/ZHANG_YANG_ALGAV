@@ -20,6 +20,13 @@ calculPerformanceTas:
 	gcc cle.c tas.c calculPerformanceTas.c -o calculPerformanceTas
 	./calculPerformanceTas
 
+testFilesBinomiales:
+	gcc filesBinomiales.c testFilesBinomiales.c -o testFilesBinomiales
+	./testFilesBinomiales
+
+testTasArbre:
+	gcc testTasArbre.c liste.c cle.c tasArbre.c -o tasArbre
+	./tasArbre
 clean:
-	rm -f *.o calculPerformanceTas testCle testOperation
+	rm -f *.o calculPerformanceTas tasArbre testCle testOperation testFilesBinomiales
 
