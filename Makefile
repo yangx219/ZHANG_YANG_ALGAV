@@ -27,6 +27,10 @@ testFilesBinomiales:
 testTasArbre:
 	gcc testTasArbre.c liste.c cle.c tasArbre.c -o tasArbre
 	./tasArbre
+
+testFB:
+	gcc FB.c -o testFB
+	./testFB
 clean:
-	rm -f *.o calculPerformanceTas tasArbre testCle testOperation testFilesBinomiales
+	rm -f *.o calculPerformanceTas tasArbre testCle testOperation testFilesBinomiales testFB
 

@@ -27,58 +27,100 @@ FileBinomiale* initFileBinomiale() {
     return Tas;
 }
 
-// Lier deux noeuds binomiaux
-void lierNoeudsBinomiaux(NoeudBinomial* y, NoeudBinomial* z) {
-    y->parent = z;
-    y->frere = z->enfant;
-    z->enfant = y;
-    z->degre++;
-}
+// 合并两个 NoeudBinomial 结点
+NoeudBinomial* binomial_merge(NoeudBinomial* h1, NoeudBinomial* h2) 
+{
+    NoeudBinomial* head = NULL;
+    NoeudBinomial** pos = &head;
 
-// Fusionner les bases binomiales
-FileBinomiale* fusionner(FileBinomiale* H1, FileBinomiale* H2) {
-    // vérifier si les deux tas sont vides
-    if (!H1 && !H2) return NULL;
-    if (!H1->tete) {
-        free(H1); 
-        return H2;
-    }
-    if (!H2->tete) {
-        free(H2);  
-        return H1;
-    }
-
-    FileBinomiale* newHeap = initFileBinomiale();
-    if (!newHeap) return NULL; 
-
-    NoeudBinomial **pos = &(newHeap->tete);
-    NoeudBinomial *h1Curr = H1->tete;
-    NoeudBinomial *h2Curr = H2->tete;
-
-    while (h1Curr && h2Curr) {
-        if (h1Curr->degre <= h2Curr->degre) {
-            *pos = h1Curr;
-            h1Curr = h1Curr->frere;
-        } else {
-            *pos = h2Curr;
-            h2Curr = h2Curr->frere;
+    while (h1 && h2)
+    {
+        if (h1->degre < h2->degre)
+        {
+            *pos = h1;
+            h1 = h1->frere;
+        } 
+        else 
+        {
+            *pos = h2;
+            h2 = h2->frere;
         }
-        pos = &((*pos)->frere);
+        pos = &(*pos)->frere;
     }
+    if (h1)
+        *pos = h1;
+    else
+        *pos = h2;
 
-    while (h1Curr) {
-        *pos = h1Curr;
-        h1Curr = h1Curr->frere;
-        pos = &((*pos)->frere);
-    }
-
-    while (h2Curr) {
-        *pos = h2Curr;
-        h2Curr = h2Curr->frere;
-        pos = &((*pos)->frere);
-    }
-    return newHeap;
+    return head;
 }
+
+// 将一个 NoeudBinomial 结点 child 合并到 heap 中
+void binomial_link(NoeudBinomial* child, NoeudBinomial* heap) 
+{
+    child->parent = heap;
+    child->frere = heap->enfant;
+    heap->enfant = child;
+    heap->degre++;
+}
+
+// 合并两个二项堆，并返回合并后的堆
+
+FileBinomiale* binomial_union(FileBinomiale* h1, FileBinomiale* h2) 
+{
+    FileBinomiale *heap;
+    NoeudBinomial *prev_x, *x, *next_x;
+
+    // 将h1, h2中的根表合并成一个按度数递增的链表heap
+    heap = initFileBinomiale();
+    if (!heap)
+        return NULL;
+
+    heap->tete = binomial_merge(h1->tete, h2->tete);
+
+    prev_x = NULL;
+    x      = heap->tete;
+    next_x = x->frere;
+
+    while (next_x != NULL)
+    {
+        if (   (x->degre != next_x->degre) 
+            || ((next_x->frere != NULL) && (next_x->degre == next_x->frere->degre))) 
+        {
+            // Case 1: x->degre != next_x->degre
+            // Case 2: x->degre == next_x->degre == next_x->frere->degre
+            prev_x = x;
+            x = next_x;
+        } 
+        else if (x->cle <= next_x->cle) 
+        {
+            // Case 3: x->degre == next_x->degre != next_x->frere->degre
+            //      && x->cle    <= next_x->cle
+            x->frere = next_x->frere;
+            binomial_link(next_x, x);
+        } 
+        else 
+        {
+            // Case 4: x->degre == next_x->degre != next_x->frere->degre
+            //      && x->cle    >  next_x->cle
+            if (prev_x == NULL) 
+            {
+                heap->tete = next_x;
+            } 
+            else 
+            {
+                prev_x->frere = next_x;
+            }
+            binomial_link(x, next_x);
+            x = next_x;
+        }
+        next_x = x->frere;
+    }
+
+    return heap;
+}
+
+
 
 // Supprimer le minimum
 NoeudBinomial* supprMin(FileBinomiale* H) {
@@ -115,7 +157,7 @@ NoeudBinomial* supprMin(FileBinomiale* H) {
         child = temp;
     }
 
-    FileBinomiale* newHeap = fusionner(H, H1);
+    FileBinomiale* newHeap = binomial_union(H, H1);
     if (!newHeap) return NULL; 
 
     H->tete = newHeap->tete;
@@ -128,28 +170,31 @@ NoeudBinomial* supprMin(FileBinomiale* H) {
 }
 
 // Ajouter un élément dans la file
-FileBinomiale* ajouter(FileBinomiale* H, NoeudBinomial* x) {
+FileBinomiale* ajouter(FileBinomiale* H, int cle) {
+    NoeudBinomial* x = creerNoeud(cle);
+    if (!x) {
+        printf("Erreur : Échec de l'insertion\n");
+        return H;
+    }
+
+    // 创建一个新的二项堆，其中只包含新插入的节点 x
     FileBinomiale* H1 = initFileBinomiale();
-    if (!H1) return NULL; 
+    if (!H1) return NULL;
+    
+    H1->tete = x;  // 将新节点设置为新堆的头节点
 
-    x->parent = NULL;
-    x->enfant = NULL;
-    x->frere = NULL;
-    x->degre = 0;
-    H1->tete = x;
-
-    FileBinomiale* newHeap = fusionner(H, H1);
-    if (!newHeap) return NULL; 
+    // 合并原始堆 H 和新堆 H1
+    FileBinomiale* newHeap = binomial_union(H, H1);
+    if (!newHeap) return NULL;
 
     return newHeap;
 }
 
+
 // Construire la file par ajouts itératifs
 FileBinomiale* construire(FileBinomiale* H, int* elements, int n) {
     for (int i = 0; i < n; i++) {
-        NoeudBinomial* x = creerNoeud(elements[i]);
-        if (!x) return NULL; 
-        H = ajouter(H, x);
+        H = ajouter(H, elements[i]);
     }
     return H;
 }
