@@ -17,6 +17,8 @@ void init_uint128(uint128_t *key, uint32_t part0, uint32_t part1, uint32_t part2
 // Affichage d'un entier de 128 bits
 void print_uint128(const uint128_t *key);
 
+void print_uint128_bis(const uint128_t *key);
+
 // Question 1.2 déterminer si cle1 est strictement inférieure à cle2
 bool inf(const uint128_t cle1, const uint128_t cle2);
 

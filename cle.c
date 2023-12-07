@@ -21,6 +21,14 @@ void print_uint128(const uint128_t *key)
     }
 }
 
+void print_uint128_bis(const uint128_t *key)
+{
+    for (int i = 0; i < 4; i++)
+    {
+        printf("%u ", key->parts[i]);
+    }
+}
+
 // Question 1.2 déterminer si cle1 est strictement inférieure à cle2
 bool inf(const uint128_t cle1, const uint128_t cle2)
 {
