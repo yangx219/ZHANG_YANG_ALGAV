@@ -20,6 +20,10 @@ calculPerformanceTas:
 	gcc cle.c tas.c calculPerformanceTas.c -o calculPerformanceTas
 	./calculPerformanceTas
 
+testTasArbre:
+	gcc testTasArbre.c liste.c cle.c tasArbre.c -o tasArbre
+	./tasArbre
+
 clean:
 	rm -f *.o calculPerformanceTas testCle testOperation
 
