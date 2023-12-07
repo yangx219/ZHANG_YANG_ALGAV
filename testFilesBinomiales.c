@@ -16,7 +16,7 @@ void afficherFileBinomiale(FileBinomiale* heap) {
 }
 
 int main() {
-    // Example usage of the functions you've implemented
+    // Example usage of the functions 
     FileBinomiale* heap = initFileBinomiale();
     int elements[] = {10, 3, 6, 5, 7, 1};
     int n = sizeof(elements) / sizeof(elements[0]);
@@ -34,6 +34,16 @@ int main() {
     printf("Heap after removing the minimum element:\n");
     afficherFileBinomiale(heap);
     free(minNode);
+
+    //测试fusionner
+    FileBinomiale* heap2 = initFileBinomiale();
+    int elements2[] = {11, 4, 8, 9, 12, 2};
+    int n2 = sizeof(elements2) / sizeof(elements2[0]);
+    construire(heap2, elements2, n2);
+    heap = fusionner(heap, heap2); 
+    printf("Heap after fusionner:\n");
+    afficherFileBinomiale(heap);
+    
 
 
 
