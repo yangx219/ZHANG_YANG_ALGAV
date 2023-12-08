@@ -2,10 +2,10 @@
 
 all:
 	@echo "Compiling..."
-	gcc ALGAV_Projet.c -o ALGAV_Projet.o 
+	gcc ALGAV_Projet.c -o ALGAV_Projet
 	@echo "Compiling done"
 	@echo "Running..."
-	./ALGAV_Projet.o
+	./ALGAV_Projet
 	@echo "Running done"
 
 testCle:
@@ -27,6 +27,10 @@ testFilesBinomiales:
 testTasArbre:
 	gcc testTasArbre.c liste.c cle.c tasArbre.c -o tasArbre
 	./tasArbre
+	
+testAbr:
+	gcc testAbr.c liste.c cle.c abr.c -o testAbr
+	./testAbr
 
 clean:
 	rm -f *.o calculPerformanceTas tasArbre testCle testOperation testFilesBinomiales 
