@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/yangxue/Desktop/M1-S1/ALGO/project/ZHANG_YANG_ALGAV",
+      "program": "/Users/yangxue/Desktop/M1-S1/ALGO/project/ZHANG_YANG_ALGAV/build/Debug/outDebug"
+    }
+  ]
+}

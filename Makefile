@@ -21,7 +21,7 @@ calculPerformanceTas:
 	./calculPerformanceTas
 
 testFilesBinomiales:
-	gcc filesBinomiales.c -o testFilesBinomiales
+	gcc filesBinomiales.c testFilesBinomiales.c -o testFilesBinomiales
 	./testFilesBinomiales
 
 testTasArbre:
