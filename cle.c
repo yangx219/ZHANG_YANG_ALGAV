@@ -3,29 +3,29 @@
 #include "cle.h"
 
 // Initialisation d'un entier de 128 bits
-void init_uint128(uint128_t *key, uint32_t part0, uint32_t part1, uint32_t part2, uint32_t part3)
+void init_uint128(uint128_t *cle, uint32_t part0, uint32_t part1, uint32_t part2, uint32_t part3)
 {
-    key->parts[0] = part0;
-    key->parts[1] = part1;
-    key->parts[2] = part2;
-    key->parts[3] = part3;
+    cle->parts[0] = part0;
+    cle->parts[1] = part1;
+    cle->parts[2] = part2;
+    cle->parts[3] = part3;
 }
 
 // Affichage d'un entier de 128 bits
-void print_uint128(const uint128_t *key)
-{
-    printf("128-bit key representation:\n");
-    for (int i = 0; i < 4; i++)
+void print_uint128(const uint128_t *cle)
+{   
+    
+    for (int i =0; i < 4; i++)
     {
-        printf("Part %d: %u\n", i, key->parts[i]);
+        printf("%08x ", cle->parts[i]);
     }
 }
 
-void print_uint128_bis(const uint128_t *key)
+void print_uint128_bis(const uint128_t *cle)
 {
     for (int i = 0; i < 4; i++)
     {
-        printf("%u ", key->parts[i]);
+        printf("%u ", cle->parts[i]);
     }
 }
 
@@ -75,19 +75,19 @@ bool process_file(const char *filename)
 
     // Read file line by line
     char line[40];
-    uint128_t key;
+    uint128_t cle;
 
     while (fgets(line, sizeof(line), file))
     {
 
         if (sscanf(line, "%8x%8x%8x%8x",
-                   &key.parts[3],
-                   &key.parts[2],
-                   &key.parts[1],
-                   &key.parts[0]) == 4)
+                   &cle.parts[3],
+                   &cle.parts[2],
+                   &cle.parts[1],
+                   &cle.parts[0]) == 4)
         {
 
-            print_uint128(&key);
+            print_uint128(&cle);
         }
         else
         {

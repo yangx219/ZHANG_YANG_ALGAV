@@ -1,75 +1,189 @@
-#include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
+#include <string.h>
 #include "tas.h"
+#include "cle.h"
+#include <time.h>
+#define REPEATS 10
+#define INITIAL_CAPACITY 1000
 
-int main()
+/************************************************************/
+// Question 2.7 :
+bool load_dataset(const char *filename, uint128_t **dataset, int *dataset_size)
 {
+    FILE *file = fopen(filename, "r");
+    if (file == NULL)
+    {
+        perror("Error opening file");
+        return false;
+    }
+
+    // mémoire allouée pour le dataset
+    *dataset = (uint128_t *)malloc(*dataset_size * sizeof(uint128_t));
+    if (!*dataset)
+    {
+        perror("Memory allocation failed");
+        fclose(file);
+        return false;
+    }
+
+    // Lire le fichier ligne par ligne
+    uint128_t key;
+    int count = 0;
+    while (fscanf(file, "%8x%8x%8x%8x",
+                  &key.parts[3], &key.parts[2],
+                  &key.parts[1], &key.parts[0]) == 4)
+    {
+        if (count < *dataset_size)
+        {
+            (*dataset)[count++] = key;
+        }
+    }
+
+    fclose(file);
+    return true;
+}
+double get_time() {
+    return (double)clock() / CLOCKS_PER_SEC;
+}
+
+//rend les construction de tas disponibles pour les tests
+void constructionAdapter(Tas *tas, uint128_t *cles, int nbCles) {
+
+     if (tas->cles != NULL) {
+        free(tas->cles);
+        tas->cles = NULL;
+    }
+    Tas new_tas = Construction(tas, cles, nbCles);
+    *tas = new_tas;
+}
+
+
+// tester une fonction et écrire les résultats dans un fichier CSV
+void test_function_and_write_to_csv(FILE *csv_file, const char *function_name, uint128_t *dataset, int nbCles, void (*function)(Tas *, uint128_t *, int)) {
+    double total_time = 0.0;
+
+    for (int i = 0; i < REPEATS; ++i) {
+        Tas tas = init_tas(); 
+
+        double start_time = get_time();
+        function(&tas, dataset, nbCles);
+        double end_time = get_time();
+
+        total_time += end_time - start_time;
+        free(tas.cles); 
+    }
+
+    double average_time = total_time / REPEATS;
+    fprintf(csv_file, "%s,%d,%.6f\n", function_name, nbCles, average_time);
+}
+
+// tester la fonction Ajout et écrire les résultats dans un fichier CSV
+void test_Ajout_performance(FILE *csv_file, uint128_t *dataset, int dataset_size) {
+    double total_time = 0.0;
+
+    for (int repeat = 0; repeat < REPEATS; ++repeat) {
+        Tas tas = init_tas();  
+
+        double start_time = get_time();
+        for (int i = 0; i < dataset_size; ++i) {
+            Ajout(&tas, dataset[i]);
+        }
+        double end_time = get_time();
+
+        total_time += (end_time - start_time);
+        free(tas.cles);  
+
+    double average_time = total_time / REPEATS;
+    fprintf(csv_file, "Ajout,%d,%.6f\n", dataset_size, average_time);
+}
+}
+// tester la fonction SupprMin et écrire les résultats dans un fichier CSV
+void test_SupprMin_performance(FILE *csv_file, uint128_t *dataset, int dataset_size) {
+    double total_time = 0.0;
+
+    for (int repeat = 0; repeat < REPEATS; ++repeat) {
+        Tas tas = init_tas();  
+
+        // Ajouter toutes les clés au tas
+        for (int i = 0; i < dataset_size; ++i) {
+            Ajout(&tas, dataset[i]);
+        }
+
+        double start_time = get_time();
+        while (tas.taille > 0) {
+            SupprMin(&tas);
+        }
+        double end_time = get_time();
+
+        total_time += (end_time - start_time);
+        free(tas.cles);  
+    }
+
+    double average_time = total_time / REPEATS;
+    fprintf(csv_file, "SupprMin,%d,%.6f\n", dataset_size, average_time);
+}
+
+
+
+void test_Union_performance(FILE *csv_file, Tas *tas1, Tas *tas2, int nbCles) {
+    double start_time = get_time();
+    Tas tas_union = Union(tas1, tas2);
+    double end_time = get_time();
+    fprintf(csv_file, "Union,%d,%.6f\n", nbCles, end_time - start_time);
+    free(tas_union.cles);
+}
+int main() {
     const char *file_format = "cles_alea/jeu_%d_nb_cles_%d.txt";
     int jeux[] = {1, 2, 3, 4, 5};
     int nb_cles[] = {1000, 5000, 10000, 20000, 50000, 80000, 120000, 200000};
     FILE *csv_file = fopen("performance.csv", "w");
 
-    if (csv_file == NULL)
-    {
+    if (csv_file == NULL) {
         perror("Cannot open CSV file");
         return 1;
     }
-    fprintf(csv_file, "Function,Size,Time\n");
+    fprintf(csv_file, "Function,nbCles,Time\n");
 
-    // 对每个数据集大小和每个jeu索引运行测试
-    for (int i = 0; i < sizeof(nb_cles) / sizeof(nb_cles[0]); ++i)
-    {
-        for (int j = 0; j < sizeof(jeux) / sizeof(jeux[0]); ++j)
-        {
-            int size = nb_cles[i];
-            uint128_t *dataset = NULL; // 初始化数据集指针为NULL
+    for (int i = 0; i < sizeof(nb_cles) / sizeof(nb_cles[0]); ++i) {
+        for (int j = 0; j < sizeof(jeux) / sizeof(jeux[0]); ++j) {
+            int nbCles = nb_cles[i];
+            uint128_t *dataset = NULL;
             char filename[256];
-            sprintf(filename, file_format, jeux[j], size);
+            sprintf(filename, file_format, jeux[j], nbCles);
 
-            // 使用load_dataset函数加载数据集
-            if (!load_dataset(filename, &dataset, &size))
-            {
+            if (!load_dataset(filename, &dataset, &nbCles)) {
                 fprintf(stderr, "Failed to load dataset from file: %s\n", filename);
-                continue; // 如果无法加载数据集则跳过这个数据集
+                continue;
             }
+            //tester la fonction 
+            test_function_and_write_to_csv(csv_file, "AjoutsIteratifs", dataset, nbCles, AjoutsIteratifs);
+        
+            test_function_and_write_to_csv(csv_file, "Construction", dataset, nbCles, constructionAdapter);
 
+            test_SupprMin_performance(csv_file, dataset, nbCles);
 
-            // 进行测试并将结果写入CSV文件
-            test_function_and_write_to_csv(csv_file, "AjoutsIteratifs", dataset, size, AjoutsIteratifs);
-            test_function_and_write_to_csv(csv_file, "Construction", dataset, size, Construction);
-            
-            //test_Ajout_performance(csv_file, dataset, size);
-
-            // 测试 SupprMin 函数的性能
-            //test_SupprMin_performance(csv_file, dataset, size);
-
-            uint128_t *dataset_copy = malloc(size * sizeof(uint128_t));
-            if (dataset_copy == NULL)
-            {
-                free(dataset); // 在退出之前释放dataset
+            uint128_t *dataset_copy = malloc(nbCles * sizeof(uint128_t));
+            if (dataset_copy == NULL) {
+                free(dataset);
                 fprintf(stderr, "Memory allocation failed for dataset_copy\n");
                 continue;
             }
-            memcpy(dataset_copy, dataset, size * sizeof(uint128_t));
-            Tas tas1 = {dataset, size};
-            Tas tas2 = {dataset_copy, size};
+            
+            Tas tas1 = init_tas();
+            tas1 =Construction(&tas1, dataset, nbCles);
+            Tas tas2 = init_tas();
+            tas2 =Construction(&tas2, dataset, nbCles);
+            // tester la fonction Union
+            test_Union_performance(csv_file, &tas1, &tas2, nbCles);
+            
 
-            double start_time = get_time();
-            if (!Union(&tas1, &tas2))
-            {
-                free(dataset);
-                free(dataset_copy);
-                fprintf(stderr, "Union failed\n");
-                continue;
-            }
-            double end_time = get_time();
-            fprintf(csv_file, "Union,%d,%.6f\n", size, end_time - start_time);
-
-            free(dataset_copy); // 释放 dataset_copy
+            free(dataset);
+            free(dataset_copy);
         }
     }
 
     fclose(csv_file);
     return 0;
 }
+

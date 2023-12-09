@@ -12,9 +12,9 @@ testCle:
 	gcc cle.c testCle.c -o testCle
 	./testCle
 
-testOperation:
-	gcc cle.c tas.c testOperation.c -o testOperation
-	./testOperation
+testTas:
+	gcc cle.c tas.c testTas.c -o testTas
+	./testTas
 
 calculPerformanceTas:
 	gcc cle.c tas.c calculPerformanceTas.c -o calculPerformanceTas
@@ -33,5 +33,5 @@ testAbr:
 	./testAbr
 
 clean:
-	rm -f *.o calculPerformanceTas tasArbre testCle testOperation testFilesBinomiales 
+	rm -f *.o calculPerformanceTas tasArbre testCle testTas testFilesBinomiales 
 
