@@ -403,6 +403,7 @@ void descendreNoeudMemeNiveau(TasArbre **tas, int niveau, int p)
 // Construit un tas avec une liste de clé
 void construction(TasArbre **tas, ListeCle *liste)
 {
+    printf("Construction avant: ");
     Element *position = liste->premier;
 
     while (position != NULL)
@@ -418,6 +419,8 @@ void construction(TasArbre **tas, ListeCle *liste)
 
         // Appliquer la méthode descendre sur chaque noeud du niveau p
         descendreNoeudMemeNiveau(tas, p, 0);
+    
+    printf("Construction après: ");
 }
 
 // Construit un tas avec une liste de clé en affichant chaque état

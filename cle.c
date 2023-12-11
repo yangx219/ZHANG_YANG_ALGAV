@@ -62,39 +62,3 @@ bool eg(const uint128_t cle1, const uint128_t cle2)
     // printf("cle1 is equal to cle2\n");
     return true;
 }
-
-// process_file() :  lire le fichier et afficher les clés
-bool process_file(const char *filename)
-{
-    FILE *file = fopen(filename, "r");
-    if (file == NULL)
-    {
-        perror("Error opening file");
-        return false;
-    }
-
-    // Read file line by line
-    char line[40];
-    uint128_t cle;
-
-    while (fgets(line, sizeof(line), file))
-    {
-
-        if (sscanf(line, "%8x%8x%8x%8x",
-                   &cle.parts[3],
-                   &cle.parts[2],
-                   &cle.parts[1],
-                   &cle.parts[0]) == 4)
-        {
-
-            print_uint128(&cle);
-        }
-        else
-        {
-            fprintf(stderr, "Parsing error: %s", line);
-        }
-    }
-
-    fclose(file);
-    return true;
-}

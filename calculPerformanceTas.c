@@ -3,6 +3,7 @@
 #include <string.h>
 #include "tas.h"
 #include "cle.h"
+#include "tasArbre.h"
 #include <time.h>
 #define REPEATS 10
 #define INITIAL_CAPACITY 1000
@@ -30,10 +31,12 @@ bool load_dataset(const char *filename, uint128_t **dataset, int *dataset_size)
     // Lire le fichier ligne par ligne
     uint128_t key;
     int count = 0;
-    while (fscanf(file, "%8x%8x%8x%8x",
-                  &key.parts[3], &key.parts[2],
-                  &key.parts[1], &key.parts[0]) == 4)
-    {
+    char line[40];
+    while (fgets(line, sizeof(line), file)) {
+        sscanf(line, "0x%8x%8x%8x%8x", 
+            &key.parts[0], &key.parts[1], &key.parts[2], &key.parts[3]);
+    
+        //printf("Read key: %08x%08x%08x%08x\n", key.parts[0], key.parts[1], key.parts[2], key.parts[3]);   
         if (count < *dataset_size)
         {
             (*dataset)[count++] = key;
@@ -126,13 +129,46 @@ void test_SupprMin_performance(FILE *csv_file, uint128_t *dataset, int dataset_s
 
 
 
+// 测试Union函数并记录性能
 void test_Union_performance(FILE *csv_file, Tas *tas1, Tas *tas2, int nbCles) {
+   // printf("Before Union: tas1 taille = %d, tas2 taille = %d\n", tas1->taille, tas2->taille);
     double start_time = get_time();
     Tas tas_union = Union(tas1, tas2);
     double end_time = get_time();
+   // printf("After Union: tas_union taille = %d\n", tas_union.taille);
+
     fprintf(csv_file, "Union,%d,%.6f\n", nbCles, end_time - start_time);
     free(tas_union.cles);
 }
+
+
+// 测试函数 - 使用数据集创建堆并打印其内容
+void test_with_dataset(const char *filename) {
+    int dataset_size = 100; // 假设数据集大小
+    uint128_t *dataset = NULL;
+
+    if (!load_dataset(filename, &dataset, &dataset_size)) {
+        fprintf(stderr, "Failed to load dataset from file: %s\n", filename);
+        return;
+    }
+
+    // 使用数据集创建堆
+    Tas tas = init_tas();
+    tas = Construction(&tas, dataset, dataset_size);
+
+    
+
+    // 执行其他操作，例如添加或删除最小元素
+
+    // 释放资源
+    free(tas.cles);
+    free(dataset);
+}
+
+
+
+
+
 int main() {
     const char *file_format = "cles_alea/jeu_%d_nb_cles_%d.txt";
     int jeux[] = {1, 2, 3, 4, 5};
@@ -161,7 +197,7 @@ int main() {
         
             test_function_and_write_to_csv(csv_file, "Construction", dataset, nbCles, constructionAdapter);
 
-            test_SupprMin_performance(csv_file, dataset, nbCles);
+            //test_SupprMin_performance(csv_file, dataset, nbCles);
 
             uint128_t *dataset_copy = malloc(nbCles * sizeof(uint128_t));
             if (dataset_copy == NULL) {
@@ -177,9 +213,9 @@ int main() {
             // tester la fonction Union
             test_Union_performance(csv_file, &tas1, &tas2, nbCles);
             
-
-            free(dataset);
             free(dataset_copy);
+            free(dataset);
+            
         }
     }
 

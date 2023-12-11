@@ -59,6 +59,7 @@ void SiftDown(Tas *tas, int index) {
 // SupprMin : Supprime l'élément minimal du tas
 void SupprMin(Tas *tas)
 {
+    
     if (tas->taille == 0)
         return;
 
@@ -68,10 +69,14 @@ void SupprMin(Tas *tas)
 
     // Restaure les propriétés du tas min
     SiftDown(tas, 0);
+    // printf("SupprMin après: ");
+    // print_tas(tas);
 }
 
 // Ajout : Ajoute un nouvel élément au tas
 void Ajout(Tas *tas, uint128_t cle) {
+    // printf("Ajout avant: ");
+    // print_tas(tas);
     if (tas->taille >= tas->capacite) {
         int nouvelleCapacite = tas->capacite + (tas->capacite >> 1);  // Augmenter la capacité de 50%
         uint128_t *nouvellesCles = realloc(tas->cles, nouvelleCapacite * sizeof(uint128_t));
@@ -89,11 +94,14 @@ void Ajout(Tas *tas, uint128_t cle) {
         echanger(&tas->cles[i], &tas->cles[(i - 1) / 2]);
         i = (i - 1) / 2;
     }
+    // printf("Ajout après: ");
+    // print_tas(tas);
 }
 
 // AjoutsIteratifs : Construit un tas en ajoutant itérativement chaque clé
 void AjoutsIteratifs(Tas *tas, uint128_t *cles,int nbCles)
 {
+    
     // Ajouter chaque clé au tas
     for (int i = 0; i < nbCles; i++)
     {
@@ -104,6 +112,11 @@ void AjoutsIteratifs(Tas *tas, uint128_t *cles,int nbCles)
 // Question 2.5 Construction : Construit un tas à partir d'une liste de clés de manière efficace
 Tas Construction(Tas *tas, uint128_t *cles, int nbCles)
 {
+    // printf("Construction avant: ");
+    // for (int i = 0; i < nbCles; i++) {
+    //     print_uint128(&cles[i]);
+    // }
+    
     tas->taille = nbCles;
     tas->cles = malloc(nbCles * sizeof(uint128_t));
     if (!tas->cles)
@@ -118,12 +131,20 @@ Tas Construction(Tas *tas, uint128_t *cles, int nbCles)
     {
         SiftDown(tas, i);
     }
+    // printf("Construction après: ");
+    // print_tas(tas);
+
     return *tas;
 }
 
 /*Question 2.6 Union : Fusionne deux tas en un seul*/
 
 Tas Union(Tas *tas1, Tas *tas2) {
+    // printf("Union avant:\nTas1: ");
+    // print_tas(tas1);
+    // printf("\nTas2: ");
+    // print_tas(tas2);
+
     int tailleUnion = tas1->taille + tas2->taille;
     
     // vérifier si la capacité du tas1 est suffisante pour contenir toutes les clés
@@ -146,6 +167,9 @@ Tas Union(Tas *tas1, Tas *tas2) {
     for (int i = (tailleUnion - 2) / 2; i >= 0; i--) {
         SiftDown(tas1, i);
     }
+
+    // printf("Union après: ");
+    // print_tas(tas1);
 
     return *tas1;
 }
