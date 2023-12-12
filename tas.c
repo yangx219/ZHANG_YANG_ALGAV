@@ -72,6 +72,18 @@ void SupprMin(Tas *tas)
     // printf("SupprMin après: ");
     // print_tas(tas);
 }
+bool isMinHeap(Tas *tas, int size) {
+    for (int i = 0; i < (size - 2) / 2; i++) {
+        // If the left child is greater, the property is violated.
+        if (inf(tas->cles[2*i + 1] , tas->cles[i]))
+            return false;
+        
+        // If the right child exists and is greater, the property is violated.
+        if (2*i + 2 < size && inf(tas->cles[2*i + 2] , tas->cles[i]))
+            return false;
+    }
+    return true;
+}
 
 // Ajout : Ajoute un nouvel élément au tas
 void Ajout(Tas *tas, uint128_t cle) {
@@ -79,17 +91,21 @@ void Ajout(Tas *tas, uint128_t cle) {
     // print_tas(tas);
     if (tas->taille >= tas->capacite) {
         int nouvelleCapacite = tas->capacite + (tas->capacite >> 1);  // Augmenter la capacité de 50%
+        // Augmenter la capacité du tas
         uint128_t *nouvellesCles = realloc(tas->cles, nouvelleCapacite * sizeof(uint128_t));
         if (!nouvellesCles) {
             perror("Allocation failure in Ajout");
             exit(EXIT_FAILURE);
         }
+        // Mettre à jour le tas
         tas->cles = nouvellesCles;
         tas->capacite = nouvelleCapacite;
     }
+    // Ajouter la nouvelle clé à la fin du tas
     tas->cles[tas->taille] = cle;
     int i = tas->taille;
     tas->taille++;
+    // Restaurer les propriétés du tas min
     while (i > 0 && inf(tas->cles[i], tas->cles[(i - 1) / 2])) {
         echanger(&tas->cles[i], &tas->cles[(i - 1) / 2]);
         i = (i - 1) / 2;
@@ -101,21 +117,29 @@ void Ajout(Tas *tas, uint128_t cle) {
 // AjoutsIteratifs : Construit un tas en ajoutant itérativement chaque clé
 void AjoutsIteratifs(Tas *tas, uint128_t *cles,int nbCles)
 {
-    
+    // printf("Ajout avant: ");
+    // print_tas(tas);
     // Ajouter chaque clé au tas
     for (int i = 0; i < nbCles; i++)
     {
         Ajout(tas, cles[i]);
+        // printf("Ajout après: ");
+        // print_tas(tas);
+        // bool isMHeap = isMinHeap(tas, tas->taille);
+        // printf("isMinHeap = %d\n", isMHeap);
+
     }
+    printf("Ajout après: Tas size = %d\n", tas->taille);
+
 }
 
 // Question 2.5 Construction : Construit un tas à partir d'une liste de clés de manière efficace
 Tas Construction(Tas *tas, uint128_t *cles, int nbCles)
 {
-    // printf("Construction avant: ");
-    // for (int i = 0; i < nbCles; i++) {
-    //     print_uint128(&cles[i]);
-    // }
+    printf("Construction avant: ");
+    for (int i = 0; i < nbCles; i++) {
+        print_uint128(&cles[i]);
+    }
     
     tas->taille = nbCles;
     tas->cles = malloc(nbCles * sizeof(uint128_t));
@@ -131,8 +155,8 @@ Tas Construction(Tas *tas, uint128_t *cles, int nbCles)
     {
         SiftDown(tas, i);
     }
-    // printf("Construction après: ");
-    // print_tas(tas);
+    printf("Construction après: ");
+    print_tas(tas);
 
     return *tas;
 }
@@ -173,5 +197,12 @@ Tas Union(Tas *tas1, Tas *tas2) {
 
     return *tas1;
 }
+
+
+
+
+
+
+
 
 

@@ -195,10 +195,10 @@ int main() {
             //tester la fonction 
             test_function_and_write_to_csv(csv_file, "AjoutsIteratifs", dataset, nbCles, AjoutsIteratifs);
         
-            test_function_and_write_to_csv(csv_file, "Construction", dataset, nbCles, constructionAdapter);
+            //test_function_and_write_to_csv(csv_file, "Construction", dataset, nbCles, constructionAdapter);
 
             //test_SupprMin_performance(csv_file, dataset, nbCles);
-
+/*
             uint128_t *dataset_copy = malloc(nbCles * sizeof(uint128_t));
             if (dataset_copy == NULL) {
                 free(dataset);
@@ -215,11 +215,14 @@ int main() {
             
             free(dataset_copy);
             free(dataset);
-            
+            */
         }
     }
 
     fclose(csv_file);
     return 0;
 }
+
+
+
 
