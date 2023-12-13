@@ -9,7 +9,7 @@
 //  Structure de tas minimum avec un arbre binaire
 typedef struct Noeud
 {
-    uint128_t cle; // Clé de l'élément
+    uint128_t cle; 
     struct Noeud *gauche, *droite;
 } Noeud;
 // Structure de tas minimum avec un tableau
@@ -46,17 +46,8 @@ Tas Construction(Tas *tas, uint128_t *cles, int nbCles);
 // et construit un tas qui contient l’ensemble de toutes les clés.
 Tas Union(Tas *tas1, Tas *tas2);
 
-// Question 2.7 :
-bool load_dataset(const char *filename, uint128_t **dataset, int *dataset_size);
-
-double get_time();
+//tester si le tas est un tas min
+bool isMinHeap(Tas *tas, int size);
 
 
-
-void constructionAdapter(Tas *tas, uint128_t *cles, int nbCles);
-void test_function_and_write_to_csv(FILE *csv_file, const char *function_name, uint128_t *dataset, int size, void (*function)(Tas *, uint128_t *, int));
-
-void test_Ajout_performance(FILE *csv_file, uint128_t *dataset, int size);
-
-void test_SupprMin_performance(FILE *csv_file, uint128_t *dataset, int size);
 #endif

@@ -58,6 +58,10 @@
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
   "files.associations": {
     "testFB.C": "cpp",
-    "testfilesBinomiales.C": "cpp"
+    "testfilesBinomiales.C": "cpp",
+    "__bit_reference": "c",
+    "__split_buffer": "c",
+    "string": "c",
+    "vector": "c"
   }
 }

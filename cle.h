@@ -25,7 +25,6 @@ bool inf(const uint128_t cle1, const uint128_t cle2);
 // Question 1.3 déterminer si cle1 est égale à cle2
 bool eg(const uint128_t cle1, const uint128_t cle2);
 
-// process_file() :  lire le fichier et afficher les clés
-bool process_file(const char *filename);
+
 
 #endif

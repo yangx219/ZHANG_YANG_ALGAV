@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "tas.h"
+#include "tasTableau.h"
 #include "cle.h"
 #include "tasArbre.h"
+#include "liste.h"
 #include <time.h>
 #define REPEATS 10
 #define INITIAL_CAPACITY 1000
@@ -49,7 +50,7 @@ bool load_dataset(const char *filename, uint128_t **dataset, int *dataset_size)
 double get_time() {
     return (double)clock() / CLOCKS_PER_SEC;
 }
-
+/****************************TasTableau*************************************************/
 //rend les construction de tas disponibles pour les tests
 void constructionAdapter(Tas *tas, uint128_t *cles, int nbCles) {
 
@@ -61,7 +62,7 @@ void constructionAdapter(Tas *tas, uint128_t *cles, int nbCles) {
     *tas = new_tas;
 }
 
-
+/*****************************************************************************/
 // tester une fonction et écrire les résultats dans un fichier CSV
 void test_function_and_write_to_csv(FILE *csv_file, const char *function_name, uint128_t *dataset, int nbCles, void (*function)(Tas *, uint128_t *, int)) {
     double total_time = 0.0;
@@ -81,6 +82,7 @@ void test_function_and_write_to_csv(FILE *csv_file, const char *function_name, u
     fprintf(csv_file, "%s,%d,%.6f\n", function_name, nbCles, average_time);
 }
 
+/*****************************************************************************/
 // tester la fonction Ajout et écrire les résultats dans un fichier CSV
 void test_Ajout_performance(FILE *csv_file, uint128_t *dataset, int dataset_size) {
     double total_time = 0.0;
@@ -101,6 +103,9 @@ void test_Ajout_performance(FILE *csv_file, uint128_t *dataset, int dataset_size
     fprintf(csv_file, "Ajout,%d,%.6f\n", dataset_size, average_time);
 }
 }
+
+
+/*****************************************************************************/
 // tester la fonction SupprMin et écrire les résultats dans un fichier CSV
 void test_SupprMin_performance(FILE *csv_file, uint128_t *dataset, int dataset_size) {
     double total_time = 0.0;
@@ -129,7 +134,8 @@ void test_SupprMin_performance(FILE *csv_file, uint128_t *dataset, int dataset_s
 
 
 
-// 测试Union函数并记录性能
+/*****************************************************************************/
+// tester la fonction Union et écrire les résultats dans un fichier CSV
 void test_Union_performance(FILE *csv_file, Tas *tas1, Tas *tas2, int nbCles) {
    // printf("Before Union: tas1 taille = %d, tas2 taille = %d\n", tas1->taille, tas2->taille);
     double start_time = get_time();
@@ -142,84 +148,67 @@ void test_Union_performance(FILE *csv_file, Tas *tas1, Tas *tas2, int nbCles) {
 }
 
 
-// 测试函数 - 使用数据集创建堆并打印其内容
-void test_with_dataset(const char *filename) {
-    int dataset_size = 100; // 假设数据集大小
-    uint128_t *dataset = NULL;
-
-    if (!load_dataset(filename, &dataset, &dataset_size)) {
-        fprintf(stderr, "Failed to load dataset from file: %s\n", filename);
-        return;
-    }
-
-    // 使用数据集创建堆
-    Tas tas = init_tas();
-    tas = Construction(&tas, dataset, dataset_size);
-
-    
-
-    // 执行其他操作，例如添加或删除最小元素
-
-    // 释放资源
-    free(tas.cles);
-    free(dataset);
-}
 
 
 
-
-
+/*****************************************************************************/
 int main() {
     const char *file_format = "cles_alea/jeu_%d_nb_cles_%d.txt";
     int jeux[] = {1, 2, 3, 4, 5};
     int nb_cles[] = {1000, 5000, 10000, 20000, 50000, 80000, 120000, 200000};
-    FILE *csv_file = fopen("performance.csv", "w");
-
-    if (csv_file == NULL) {
-        perror("Cannot open CSV file");
+    
+    FILE *csv_file_tas_tableau = fopen("performance_tas_tableau.csv", "w");
+    if (csv_file_tas_tableau == NULL) {
+        perror("Cannot open performance_tas_tableau.csv");
         return 1;
     }
-    fprintf(csv_file, "Function,nbCles,Time\n");
+    fprintf(csv_file_tas_tableau, "Function,nbCles,Time\n");
 
     for (int i = 0; i < sizeof(nb_cles) / sizeof(nb_cles[0]); ++i) {
         for (int j = 0; j < sizeof(jeux) / sizeof(jeux[0]); ++j) {
             int nbCles = nb_cles[i];
-            uint128_t *dataset = NULL;
+            uint128_t *dataset1 = NULL;
+            uint128_t *dataset2 = NULL;
             char filename[256];
             sprintf(filename, file_format, jeux[j], nbCles);
 
-            if (!load_dataset(filename, &dataset, &nbCles)) {
+            if (!load_dataset(filename, &dataset1, &nbCles)) {
                 fprintf(stderr, "Failed to load dataset from file: %s\n", filename);
                 continue;
             }
-            //tester la fonction 
-            test_function_and_write_to_csv(csv_file, "AjoutsIteratifs", dataset, nbCles, AjoutsIteratifs);
+            /********************tester la fonction AjoutsIteratifs et Construction************************/ 
+            test_function_and_write_to_csv(csv_file_tas_tableau, "AjoutsIteratifs", dataset1, nbCles, AjoutsIteratifs);
         
-            //test_function_and_write_to_csv(csv_file, "Construction", dataset, nbCles, constructionAdapter);
+            test_function_and_write_to_csv(csv_file_tas_tableau, "Construction", dataset1, nbCles, constructionAdapter);
 
             //test_SupprMin_performance(csv_file, dataset, nbCles);
-/*
-            uint128_t *dataset_copy = malloc(nbCles * sizeof(uint128_t));
-            if (dataset_copy == NULL) {
-                free(dataset);
-                fprintf(stderr, "Memory allocation failed for dataset_copy\n");
+
+
+        
+            sprintf(filename, file_format, (jeux[j] % 5) + 1, nbCles);
+            if (!load_dataset(filename, &dataset2, &nbCles)) {
+                fprintf(stderr, "Failed to load second dataset from file: %s\n", filename);
+                free(dataset1);
                 continue;
             }
-            
             Tas tas1 = init_tas();
-            tas1 =Construction(&tas1, dataset, nbCles);
+            tas1 =Construction(&tas1, dataset1, nbCles);
             Tas tas2 = init_tas();
-            tas2 =Construction(&tas2, dataset, nbCles);
-            // tester la fonction Union
-            test_Union_performance(csv_file, &tas1, &tas2, nbCles);
+            tas2 =Construction(&tas2, dataset2, nbCles);
+
+
+            /********************tester la fonction Union************************/
+            test_Union_performance(csv_file_tas_tableau, &tas1, &tas2, nbCles);
             
-            free(dataset_copy);
-            free(dataset);
-            */
+            
+
+            free(dataset1);
+            free(dataset2);
+
+        
         }
     }
-
-    fclose(csv_file);
+    fclose(csv_file_tas_tableau);
     return 0;
 }
 

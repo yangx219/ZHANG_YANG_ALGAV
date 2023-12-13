@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "cle.h"
-#include "tas.h"
+#include "tasTableau.h"
 #define INITIAL_CAPACITY 1000  //capacité initiale du tas
 
 int main() {
-    
+        
     Tas tas1 = init_tas();
     uint128_t test_Cles[6] = {
         {0xdf6943ba, 0x6d51464f, 0x6b021579, 0x33bdd9ad},
@@ -16,13 +16,15 @@ int main() {
         
         {0xdf5d8018, 0xd0af5d1a, 0x979d449c, 0x91282bfc}       
     };
-
-    printf("\n\n————Testing Construction...\n");
+    
+    printf("\n————Testing Construction...\n");
     int nbCles1 = sizeof(test_Cles) / sizeof(test_Cles[0]);
     tas1 = Construction(&tas1, test_Cles, nbCles1);
-    printf("\n————Heap constructed with %d Clestest_Cles.\n", nbCles1);
-    printf("\n————Heap after Construction:\n");
+    bool isMiHeap = isMinHeap(&tas1, tas1.taille);
+    printf("\n————Tas constructed with %d Clestest_Cles.\n", nbCles1);
+    printf("\n————Tas after Construction:\n");
     print_tas(&tas1);
+    printf("\n\n————isMinHeap: %d\n", isMiHeap);
 
     printf("\n\n————testing Ajout...\n");
     printf("\n————Ajouter les Cles:\n");
@@ -33,7 +35,7 @@ int main() {
 
     printf("\n\n————Testing SupprMin...\n");
     SupprMin(&tas1);
-    printf("\n————Heap after SupprMin:\n");
+    printf("\n————Tas after SupprMin:\n");
     print_tas(&tas1);
 
     
@@ -45,7 +47,7 @@ int main() {
     int nbCles2 = sizeof(test_Cles2_AjoutIte) / sizeof(test_Cles2_AjoutIte[0]);
     printf("\n————Added %d Cles iteratively.\n", nbCles2);
     AjoutsIteratifs(&tas1, test_Cles2_AjoutIte, nbCles2);
-    printf("\n————Heap after AjoutsIteratifs:\n");
+    printf("\n————Tas after AjoutsIteratifs:\n");
     print_tas(&tas1);
     
     printf("\n\n————Testing Union...\n");

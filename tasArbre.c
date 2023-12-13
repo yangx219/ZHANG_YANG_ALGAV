@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "cle.h"
-#include "TasArbre.h"
+#include "tasArbre.h"
 #include "liste.h"
 
 /****************************************************/
@@ -403,7 +403,7 @@ void descendreNoeudMemeNiveau(TasArbre **tas, int niveau, int p)
 // Construit un tas avec une liste de clé
 void construction(TasArbre **tas, ListeCle *liste)
 {
-    printf("Construction avant: ");
+    //printf("Construction avant: ");
     Element *position = liste->premier;
 
     while (position != NULL)
@@ -420,7 +420,7 @@ void construction(TasArbre **tas, ListeCle *liste)
         // Appliquer la méthode descendre sur chaque noeud du niveau p
         descendreNoeudMemeNiveau(tas, p, 0);
     
-    printf("Construction après: ");
+    //printf("Construction après: ");
 }
 
 // Construit un tas avec une liste de clé en affichant chaque état
@@ -552,3 +552,4 @@ void *unionTasArbreAfficheEtape(TasArbre *tas1, TasArbre *tas2)
         printf("\n\n");
     }
 }
+

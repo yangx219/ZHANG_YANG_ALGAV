@@ -1,0 +1,6 @@
+Function,nbCles,Time
+TasArbre_Union,1000,0.027992
+TasArbre_Union,5000,0.289121
+TasArbre_Union,10000,1.133750
+TasArbre_Union,20000,4.527367
+TasArbre_Union,50000,28.514937

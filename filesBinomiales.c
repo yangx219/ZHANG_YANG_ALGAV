@@ -4,17 +4,25 @@
 #include <limits.h>
 #include <math.h>
 
-//lier deaux tas binomiaux de même degré
+// Lier deux tas binomiaux de même degré
 BinNode lier(BinNode tree1, BinNode tree2) {
-    if (tree1->cle > tree2->cle) {
-        return lier(tree2, tree1);
+    if (inf(tree1->cle, tree2->cle)) {
+        // Si la clé de tree1 est inférieure, tree1 devient le parent
+        tree2->parent = tree1;
+        tree2->frere = tree1->enfant;
+        tree1->enfant = tree2;
+        tree1->degree++;
+        return tree1;
+    } else {
+        // Si la clé de tree2 est inférieure ou égale, tree2 devient le parent
+        tree1->parent = tree2;
+        tree1->frere = tree2->enfant;
+        tree2->enfant = tree1;
+        tree2->degree++;
+        return tree2;
     }
-    tree2->parent = tree1;
-    tree2->frere = tree1->enfant;
-    tree1->enfant = tree2;
-    tree1->degree++;
-    return tree1;
 }
+
 
 //initialiser un file binomiale
 BinHeap Init() {
@@ -48,7 +56,7 @@ void expandHeap(BinHeap H) {
     H->capacity = newCapacity;
 }
 
-//union de deux tas binomiaux
+//union de deux files binomiaux
 void fb_union(BinHeap H1, BinHeap H2) {
     //si size de sum est supérieur à la capacité, étendre la capacité
     if (H1->size + H2->size > H1->capacity) {
@@ -114,14 +122,14 @@ void fb_union(BinHeap H1, BinHeap H2) {
 }
     
 //ajouter un élément au file binomial 
-void ajout(BinHeap H, int C) {
+void ajout(BinHeap H, uint128_t Cle) {
     //si la taille du file binomial est égale à sa capacité, étendre la capacité
     if (H->size == H->capacity) {
         expandHeap(H);
     }
     //créer un nouvel file binomial avec un seul noeud
     BinNode newNode = (BinNode)malloc(sizeof(struct Node));
-    newNode->cle = C;
+    newNode->cle = Cle;
     newNode->degree = 0;
     newNode->parent = NULL;
     newNode->enfant = NULL;
@@ -136,29 +144,37 @@ void ajout(BinHeap H, int C) {
 }
 
 //supprimer l'élément minimum du tas binomial
-int SupprMin(BinHeap H) {
-    //si le file binomial est vide, retourner -1
+uint128_t fb_SupprMin(BinHeap H) {
+    // Définir une valeur maximale pour uint128_t
+    uint128_t maxCle;
+    init_uint128(&maxCle, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX);
+
+    // Si le file binomial est vide, retourner un maximum uint128_t
     if (H == NULL || H->size == 0) {
-        return -1;
+        return maxCle;
     }
-    //trouver le plus petit élément dans le file binomial
+
+    // Trouver le plus petit élément dans le file binomial
     int minIndex = -1;
-    int minCle = INT_MAX;
-    //parcourir tous les tas binomiaux dans le file binomial
+    uint128_t minCle = maxCle;
+
     for (int i = 0; i < H->capacity; i++) {
-        if (H->list[i] != NULL && H->list[i]->cle < minCle) {
+        if (H->list[i] != NULL && inf(H->list[i]->cle, minCle)) {
             minCle = H->list[i]->cle;
             minIndex = i;
         }
     }
-    //si le plus petit élément n'est pas trouvé, retourner -1
+
+    // Si le plus petit élément n'est pas trouvé, retourner un maximum uint128_t
     if (minIndex == -1) {
-        return -1;
+        return maxCle;
     }
-    //supprimer le plus petit élément du file binomial
+
+    // Supprimer le plus petit élément du file binomial
     BinNode minTreeRoot = H->list[minIndex];
     H->list[minIndex] = NULL;
-    //inverser la liste d'enfants de minTreeRoot
+
+    // Inverser la liste d'enfants de minTreeRoot
     BinNode prev = NULL;
     BinNode current = minTreeRoot->enfant;
     while (current != NULL) {
@@ -167,7 +183,8 @@ int SupprMin(BinHeap H) {
         prev = current;
         current = next;
     }
-    //créer un nouveau file binomial avec les arbres inversés
+
+    // Créer un nouveau file binomial avec les arbres inversés
     BinHeap newHeap = Init();
     newHeap->size = (1 << minIndex) - 1;
     int childIndex = 0;
@@ -177,27 +194,29 @@ int SupprMin(BinHeap H) {
         newHeap->list[childIndex]->frere = NULL;
         childIndex++;
     }
-    //fusionner le nouveau file binomial avec le file binomial d'origine
+
+    // Fusionner le nouveau file binomial avec le file binomial d'origine
     fb_union(H, newHeap);
-    free(newHeap); 
+    free(newHeap);
+
+    // Libérer la mémoire du nœud racine supprimé
     free(minTreeRoot);
 
-    if (H->size > (1 << minIndex)) {
-        H->size -= (1 << minIndex);
-    } else {
-        H->size = 0;
-    }
+    // Mettre à jour la taille de H
+    H->size = H->size - (1 << minIndex);
 
+    // Retourner la clé minimale
     return minCle;
 }
 
 
 
+
 // Construction d'un file binomial à partir d'un tableau d'éléments
-BinHeap fb_Construction(int *elements, int n) {
+BinHeap fb_Construction(uint128_t *Cles, int n) {
     BinHeap H = Init(); // Initialize a new binomial heap
     for (int i = 0; i < n; i++) {
-        ajout(H, elements[i]); // Add each element to the heap
+        ajout(H, Cles[i]); // Add each element to the heap
     }
     return H;
 }
@@ -205,19 +224,20 @@ BinHeap fb_Construction(int *elements, int n) {
 void traverse(BinTree L) {
     //parcourir l'arbre en utilisant un parcours préfixe
     if (L) {
-        printf("%d ", L->cle);
+        printf("\n------    clé_128   ------\n");
+        print_uint128(&L->cle);
         traverse(L->enfant);
         traverse(L->frere);
     }
 }
 
 void afficher(BinHeap H) {
-    printf("Binomial Heap:\n");
+    printf("\nBinomial Heap:\n");
     //parcourir tous les tas binomiaux dans le file binomial
     for (int i = 0; i < H->capacity; i++) {
         //si le tas binomial est présent, afficher le tas
         if (H->list[i]) {
-            printf("Tree of degree %d:\n", i);
+            printf("\nTree of degree %d:\n", i);
             traverse(H->list[i]);
             printf("\n");
         }

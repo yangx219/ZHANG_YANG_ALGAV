@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cle.h"
-#include "tas.h"
+#include "tasTableau.h"
 #define REPEATS 10
 #define INITIAL_CAPACITY 1000
 
@@ -26,6 +26,8 @@ void print_tas(Tas *tas)
         print_uint128(&tas->cles[i]);
     }
 }
+
+/*********************************************Echanger***********************************************************/
 // Fonction pour échanger deux éléments uint128_t
 void echanger(uint128_t *a, uint128_t *b)
 {
@@ -34,6 +36,7 @@ void echanger(uint128_t *a, uint128_t *b)
     *b = temp;
 }
 
+/*********************************************SiftDown***********************************************************/
 // Fonction pour restaurer les propriétés d'un tas min après la suppression du min
 void SiftDown(Tas *tas, int index) {
     while (index < tas->taille) {
@@ -56,6 +59,7 @@ void SiftDown(Tas *tas, int index) {
     }
 }
 
+/*********************************************SupprMin***********************************************************/
 // SupprMin : Supprime l'élément minimal du tas
 void SupprMin(Tas *tas)
 {
@@ -85,10 +89,9 @@ bool isMinHeap(Tas *tas, int size) {
     return true;
 }
 
+/*********************************************Ajout***********************************************************/
 // Ajout : Ajoute un nouvel élément au tas
 void Ajout(Tas *tas, uint128_t cle) {
-    // printf("Ajout avant: ");
-    // print_tas(tas);
     if (tas->taille >= tas->capacite) {
         int nouvelleCapacite = tas->capacite + (tas->capacite >> 1);  // Augmenter la capacité de 50%
         // Augmenter la capacité du tas
@@ -110,10 +113,8 @@ void Ajout(Tas *tas, uint128_t cle) {
         echanger(&tas->cles[i], &tas->cles[(i - 1) / 2]);
         i = (i - 1) / 2;
     }
-    // printf("Ajout après: ");
-    // print_tas(tas);
 }
-
+/*********************************************AjoutsIteratifs***********************************************************/
 // AjoutsIteratifs : Construit un tas en ajoutant itérativement chaque clé
 void AjoutsIteratifs(Tas *tas, uint128_t *cles,int nbCles)
 {
@@ -129,17 +130,19 @@ void AjoutsIteratifs(Tas *tas, uint128_t *cles,int nbCles)
         // printf("isMinHeap = %d\n", isMHeap);
 
     }
-    printf("Ajout après: Tas size = %d\n", tas->taille);
+    //printf("Ajout après: Tas size = %d\n", tas->taille);
 
 }
 
+
+/*********************************************Construction***********************************************************/
 // Question 2.5 Construction : Construit un tas à partir d'une liste de clés de manière efficace
 Tas Construction(Tas *tas, uint128_t *cles, int nbCles)
 {
-    printf("Construction avant: ");
-    for (int i = 0; i < nbCles; i++) {
-        print_uint128(&cles[i]);
-    }
+    // printf("Construction avant: ");
+    // for (int i = 0; i < nbCles; i++) {
+    //     print_uint128(&cles[i]);
+    // }
     
     tas->taille = nbCles;
     tas->cles = malloc(nbCles * sizeof(uint128_t));
@@ -150,19 +153,22 @@ Tas Construction(Tas *tas, uint128_t *cles, int nbCles)
     }
     memcpy(tas->cles, cles, nbCles * sizeof(uint128_t));
 
-    // Construire le tas en partant des nœuds à mi-chemin dans l'arbre et en descendant
-    for (int i = (nbCles - 2) / 2; i >= 0; i--)
-    {
+   
+    // Construire le tas à partir de la liste
+
+    for (int i = (nbCles - 2) / 2; i >= 0; i--) {
         SiftDown(tas, i);
     }
-    printf("Construction après: ");
-    print_tas(tas);
+
+    // printf("Construction après: ");
+    // print_tas(tas);
 
     return *tas;
 }
 
-/*Question 2.6 Union : Fusionne deux tas en un seul*/
 
+/*********************************************Union***********************************************************/
+/*Question 2.6 Union : Fusionne deux tas en un seul*/
 Tas Union(Tas *tas1, Tas *tas2) {
     // printf("Union avant:\nTas1: ");
     // print_tas(tas1);

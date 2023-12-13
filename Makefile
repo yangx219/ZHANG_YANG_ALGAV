@@ -12,16 +12,32 @@ testCle:
 	gcc cle.c testCle.c -o testCle
 	./testCle
 
-testTas:
-	gcc cle.c tas.c testTas.c -o testTas
+testTasTableau:
+	gcc cle.c tasTableau.c testTas.c -o testTas
 	./testTas
 
-calculPerformanceTas:
-	gcc cle.c tas.c calculPerformanceTas.c -o calculPerformanceTas
-	./calculPerformanceTas
+calculPerformanceTasTableau:
+	gcc cle.c tasTableau.c liste.c tasArbre.c calculPerformanceTasTableau.c -o calculPerformanceTasTableau
+	./calculPerformanceTasTableau
+
+calculPerformanceTasArbreCons:
+	gcc cle.c tasTableau.c liste.c tasArbre.c calculPerformanceTasArbreCons.c -o calculPerformanceTasArbreCons
+	./calculPerformanceTasArbreCons
+
+calculPerformanceTasArbreAjoutIt:
+	gcc cle.c tasTableau.c liste.c tasArbre.c calculPerformanceTasArbreAjoutIt.c -o calculPerformanceTasArbreAjoutIt
+	./calculPerformanceTasArbreAjoutIt
+
+calculPerformanceTasArbreUnion:
+	gcc cle.c tasTableau.c liste.c tasArbre.c calculPerformanceTasArbreUnion.c -o calculPerformanceTasArbreUnion
+	./calculPerformanceTasArbreUnion
+
+performanceFilesBinomiales:
+	gcc cle.c tasTableau.c filesBinomiales.c calculPerformanceFB.c -o performanceFilesBinomiales
+	./performanceFilesBinomiales
 
 testFilesBinomiales:
-	gcc filesBinomiales.c testFilesBinomiales.c -o testFilesBinomiales
+	gcc cle.c tasTableau.c filesBinomiales.c testFilesBinomiales.c -o testFilesBinomiales
 	./testFilesBinomiales
 
 testTasArbre:
@@ -33,5 +49,5 @@ testAbr:
 	./testAbr
 
 clean:
-	rm -f *.o calculPerformanceTas tasArbre testCle testTas testFilesBinomiales 
+	rm -f *.o calculPerformanceTasTableau calculPerformanceTasArbreCons calculPerformanceTasArbreAjoutIt calculPerformanceTasArbreUnion tasArbre testCle testTas testFilesBinomiales performanceFilesBinomiales testAbr
 
