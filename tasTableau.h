@@ -6,12 +6,14 @@
 #include <stdbool.h>
 
 // Question 2.4
+
 //  Structure de tas minimum avec un arbre binaire
 typedef struct Noeud
 {
-    uint128_t cle; 
+    uint128_t cle;
     struct Noeud *gauche, *droite;
 } Noeud;
+
 // Structure de tas minimum avec un tableau
 typedef struct
 {
@@ -20,9 +22,9 @@ typedef struct
     int capacite;    // Capacité du tableau
 } Tas;
 
-//afficher le tas
+// afficher le tas
 void print_tas(Tas *tas);
-//initialiser le tas
+// initialiser le tas
 Tas init_tas();
 // Fonction pour échanger deux éléments uint128_t
 void echanger(uint128_t *a, uint128_t *b);
@@ -46,8 +48,7 @@ Tas Construction(Tas *tas, uint128_t *cles, int nbCles);
 // et construit un tas qui contient l’ensemble de toutes les clés.
 Tas Union(Tas *tas1, Tas *tas2);
 
-//tester si le tas est un tas min
+// tester si le tas est un tas min
 bool isMinHeap(Tas *tas, int size);
-
 
 #endif

@@ -1,12 +1,7 @@
 #!/bin/bash
 
 all:
-	@echo "Compiling..."
-	gcc ALGAV_Projet.c -o ALGAV_Projet
-	@echo "Compiling done"
-	@echo "Running..."
-	./ALGAV_Projet
-	@echo "Running done"
+	
 
 testCle:
 	gcc cle.c testCle.c -o testCle
@@ -47,6 +42,10 @@ testTasArbre:
 testAbr:
 	gcc testAbr.c liste.c cle.c abr.c -o testAbr
 	./testAbr
+
+testMd5:
+	gcc testMd5.c md5.c cle.c -o md5
+	./md5
 
 clean:
 	rm -f *.o calculPerformanceTasTableau calculPerformanceTasArbreCons calculPerformanceTasArbreAjoutIt calculPerformanceTasArbreUnion tasArbre testCle testTas testFilesBinomiales performanceFilesBinomiales testAbr
