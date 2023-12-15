@@ -1,6 +1,9 @@
 Function,nbCles,Time
-TasArbre_AjoutsIteratifs,1000,0.011935
-TasArbre_AjoutsIteratifs,5000,0.192243
-TasArbre_AjoutsIteratifs,10000,0.769292
-TasArbre_AjoutsIteratifs,20000,3.079742
-TasArbre_AjoutsIteratifs,50000,19.309505
+TasArbre_AjoutsIteratifs,1000,0.010000
+TasArbre_AjoutsIteratifs,5000,0.183000
+TasArbre_AjoutsIteratifs,10000,0.742000
+TasArbre_AjoutsIteratifs,20000,3.095000
+TasArbre_AjoutsIteratifs,50000,21.500000
+TasArbre_AjoutsIteratifs,80000,55.101000
+TasArbre_AjoutsIteratifs,120000,195.454000
+TasArbre_AjoutsIteratifs,200000,658.653000
