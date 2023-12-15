@@ -57,12 +57,12 @@ void test_construction_performance(FILE *csv_file, uint128_t *elements, int n) {
     free(heap);
 }
 
-void test_union_performance(FILE *csv_file, uint128_t *elements1, uint128_t *elements2, int n) {
-    BinHeap heap1 = fb_Construction(elements1, n);
+void test_union_performance(FILE *csv_file, uint128_t *elements1, uint128_t *elements2, int nbcle1, int nbcle2) {
+    BinHeap heap1 = fb_Construction(elements1, nbcle1);
     // printf("heap1 size: %d\n", heap1->size);
     // afficher(heap1);
     
-    BinHeap heap2 = fb_Construction(elements2, n);
+    BinHeap heap2 = fb_Construction(elements2, nbcle2);
     // afficher(heap2);
     // printf("heap2 size: %d\n", heap2->size);
 
@@ -70,11 +70,11 @@ void test_union_performance(FILE *csv_file, uint128_t *elements1, uint128_t *ele
     fb_union(heap1, heap2);
     double end_time = get_time();
     // printf("fb_union size: %d\n", heap1->size);
-    fprintf(csv_file, "Union,%d,%.6f\n", n, end_time - start_time);
+    fprintf(csv_file, "Union,%d,%.6f\n", nbcle1, end_time - start_time);
     free(heap1);
 }
 
-
+/*
 int main() {
     const char *file_format = "cles_alea/jeu_%d_nb_cles_%d.txt";
     int jeux[] = {1, 2, 3, 4, 5};
@@ -90,6 +90,7 @@ int main() {
     for (int i = 0; i < sizeof(nb_cles) / sizeof(nb_cles[0]); ++i) {
         for (int j = 0; j < sizeof(jeux) / sizeof(jeux[0]); ++j) {
             int nbCles = nb_cles[i];
+            
             uint128_t *dataset1 = NULL;
             uint128_t *dataset2 = NULL;
             char filename1[256];
@@ -112,6 +113,57 @@ int main() {
 
             // 测试 fb_union
             test_union_performance(csv_file, dataset1, dataset2, nbCles);
+
+            free(dataset1);
+            free(dataset2);
+        }
+    }
+
+    fclose(csv_file);
+    return 0;
+}
+*/
+
+
+int main() {
+    const char *file_format = "cles_alea/jeu_%d_nb_cles_%d.txt";
+    int jeux[] = {1, 2, 3, 4, 5};
+    int nb_cles[] = {1000, 5000, 10000, 20000, 50000, 80000, 120000, 200000};
+
+    FILE *csv_file = fopen("performance_files_binomiales.csv", "w");
+    if (csv_file == NULL) {
+        perror("Cannot open performance_files_binomiales.csv");
+        return 1;
+    }
+    fprintf(csv_file, "Function,nbCles,Time\n");
+
+    for (int i = 0; i < sizeof(nb_cles) / sizeof(nb_cles[0]); ++i) {
+        for (int j = 0; j < sizeof(jeux) / sizeof(jeux[0]); ++j) {
+            int nbCles1 = nb_cles[i];
+            int nbCles2 = (nb_cles[i%5+1]); // 第二个数据集大小为第一个的一半
+
+            uint128_t *dataset1 = NULL;
+            uint128_t *dataset2 = NULL;
+            char filename1[256];
+            char filename2[256];
+            sprintf(filename1, file_format, jeux[j], nbCles1);
+            sprintf(filename2, file_format, (jeux[j] % 5) + 1, nbCles2); // 使用不同的文件
+
+            if (!load_dataset(filename1, &dataset1, &nbCles1)) {
+                fprintf(stderr, "Failed to load dataset from file: %s\n", filename1);
+                continue;
+            }
+            if (!load_dataset(filename2, &dataset2, &nbCles2)) {
+                fprintf(stderr, "Failed to load dataset from file: %s\n", filename2);
+                free(dataset1); // 释放第一个数据集的内存
+                continue;
+            }
+
+            // 测试 fb_Construction
+            test_construction_performance(csv_file, dataset1, nbCles1);
+
+            // 测试 fb_union
+            test_union_performance(csv_file, dataset1, dataset2, nbCles1, nbCles2);
 
             free(dataset1);
             free(dataset2);

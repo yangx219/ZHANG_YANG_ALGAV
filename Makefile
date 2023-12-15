@@ -13,8 +13,8 @@ testCle:
 	./testCle
 
 testTasTableau:
-	gcc cle.c tasTableau.c testTas.c -o testTas
-	./testTas
+	gcc cle.c tasTableau.c testTasTableau.c -o testTasTableau
+	./testTasTableau
 
 calculPerformanceTasTableau:
 	gcc cle.c tasTableau.c liste.c tasArbre.c calculPerformanceTasTableau.c -o calculPerformanceTasTableau
@@ -49,5 +49,5 @@ testAbr:
 	./testAbr
 
 clean:
-	rm -f *.o calculPerformanceTasTableau calculPerformanceTasArbreCons calculPerformanceTasArbreAjoutIt calculPerformanceTasArbreUnion tasArbre testCle testTas testFilesBinomiales performanceFilesBinomiales testAbr
+	rm -f *.o calculPerformanceTasTableau calculPerformanceTasArbreCons calculPerformanceTasArbreAjoutIt calculPerformanceTasArbreUnion tasArbre testCle testTasTableau testFilesBinomiales performanceFilesBinomiales testAbr
 
