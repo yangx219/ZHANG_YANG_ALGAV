@@ -17,7 +17,7 @@ void print_uint128(const uint128_t *cle)
     
     for (int i =0; i < 4; i++)
     {
-        printf("%08x ", cle->parts[i]);
+        printf("%u ", cle->parts[i]);
     }
 }
 
