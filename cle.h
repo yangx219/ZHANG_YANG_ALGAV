@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 // Question 1.1 Définition d'un type pour représenter un entier de 128 bits
+
 typedef struct
 {
     // Tableau de 4 entiers de 32 bits
@@ -24,7 +25,5 @@ bool inf(const uint128_t cle1, const uint128_t cle2);
 
 // Question 1.3 déterminer si cle1 est égale à cle2
 bool eg(const uint128_t cle1, const uint128_t cle2);
-
-
 
 #endif
